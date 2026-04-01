@@ -36,14 +36,14 @@ KESMO is a production-ready CLI tool that connects to LLM providers (OpenAI, Cla
 Install globally via npm:
 
 ```bash
-npm install -g kesmo
+npm install -g kesmo-cli
 ```
 
 Or as a project dependency:
 
 ```bash
-npm install kesmo
-npx kesmo
+npm install kesmo-cli
+npx kesmo-cli
 ```
 
 **Requirements:** Node.js 18.0.0 or higher
