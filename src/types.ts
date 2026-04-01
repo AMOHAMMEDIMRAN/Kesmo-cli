@@ -48,3 +48,40 @@ export interface AnalysisOptions {
   maxFiles?: number;
   specificFile?: string;
 }
+
+export interface EditOperation {
+  action: "replace";
+  file: string;
+  find: string;
+  replace: string;
+  reason?: string;
+}
+
+export interface EditPlan {
+  summary: string;
+  notes?: string[];
+  edits: EditOperation[];
+}
+
+export interface EditApplyOptions {
+  dryRun?: boolean;
+  cwd?: string;
+}
+
+export interface EditApplyResult {
+  summary: string;
+  applied: Array<{
+    file: string;
+    action: "replace";
+    reason?: string;
+    preview: string;
+  }>;
+  skipped: Array<{
+    file: string;
+    reason: string;
+  }>;
+  failed: Array<{
+    file: string;
+    reason: string;
+  }>;
+}

@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { KesmoConfig } from "../../types.js";
+import type { LLMRunOptions } from "./index.js";
 
 interface ClaudeResponse {
   content: Array<{ type: string; text: string }>;
@@ -8,12 +9,13 @@ interface ClaudeResponse {
 export async function runClaude(
   prompt: string,
   config: KesmoConfig,
+  options: LLMRunOptions = {},
 ): Promise<string> {
   const res = await axios.post<ClaudeResponse>(
     "https://api.anthropic.com/v1/messages",
     {
       model: config.model,
-      max_tokens: 4096,
+      max_tokens: options.maxOutputTokens ?? (options.reasoning ? 2200 : 1100),
       messages: [{ role: "user", content: prompt }],
     },
     {

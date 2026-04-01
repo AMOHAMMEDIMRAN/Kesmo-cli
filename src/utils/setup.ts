@@ -13,7 +13,7 @@ ${chalk.cyan("╚═╝  ╚═╝╚══════╝╚══════�
 ${chalk.dim("        AI Code Analysis Engine v1.0.0")}
 `;
 
-const PROVIDER_MODELS: Record<ProviderType, string[]> = {
+export const PROVIDER_MODELS: Record<ProviderType, string[]> = {
   openai: [
     "gpt-4.1",
     "gpt-4.1-mini",
@@ -50,15 +50,15 @@ const PROVIDER_MODELS: Record<ProviderType, string[]> = {
   ],
 };
 
-const MODEL_TAGS: Record<string, string> = {
+export const MODEL_TAGS: Record<string, string> = {
   "gpt-4.1": "Latest",
   "gpt-4.1-mini": "Fast",
   "gpt-4.1-nano": "Fastest",
   "gpt-4o": "Stable",
   "gpt-4o-mini": "Budget",
-  "o3": "Reasoning",
+  o3: "Reasoning",
   "o3-mini": "Reasoning Fast",
-  "o1": "Advanced",
+  o1: "Advanced",
   "o1-mini": "Advanced Fast",
   "claude-sonnet-4-20250514": "Latest",
   "claude-opus-4-20250514": "Most Powerful",
@@ -85,6 +85,14 @@ const MODEL_TAGS: Record<string, string> = {
   "gemini-1.5-flash": "Budget",
 };
 
+export function getSuggestedModels(provider: ProviderType): string[] {
+  return PROVIDER_MODELS[provider] ?? [];
+}
+
+export function getModelTag(model: string): string {
+  return MODEL_TAGS[model] ?? "";
+}
+
 function printBanner(): void {
   console.clear();
   console.log(KESMO_BANNER);
@@ -93,9 +101,18 @@ function printBanner(): void {
 
 function printTips(): void {
   console.log(chalk.bold.white("Tips for getting started:"));
-  console.log(chalk.gray("1. ") + chalk.cyan("/help") + chalk.gray(" for more information."));
-  console.log(chalk.gray("2. ") + chalk.gray("Ask coding questions, edit code or run commands."));
-  console.log(chalk.gray("3. ") + chalk.gray("Be specific for the best results."));
+  console.log(
+    chalk.gray("1. ") +
+      chalk.cyan("/help") +
+      chalk.gray(" for more information."),
+  );
+  console.log(
+    chalk.gray("2. ") +
+      chalk.gray("Ask coding questions, edit code or run commands."),
+  );
+  console.log(
+    chalk.gray("3. ") + chalk.gray("Be specific for the best results."),
+  );
   console.log();
 }
 
@@ -103,12 +120,32 @@ export async function ensureSetup(): Promise<void> {
   if (configExists()) {
     printBanner();
     printTips();
-    console.log(chalk.green("✓") + chalk.white(" KESMO is configured and ready.\n"));
+    console.log(
+      chalk.green("✓") + chalk.white(" KESMO is configured and ready.\n"),
+    );
     console.log(chalk.bold.white("Commands:"));
-    console.log(chalk.gray("  kesmo plugin  ") + chalk.dim("Select and run an analysis agent"));
-    console.log(chalk.gray("  kesmo scan    ") + chalk.dim("Run all agents on codebase"));
-    console.log(chalk.gray("  kesmo config  ") + chalk.dim("View or update configuration"));
-    console.log(chalk.gray("  kesmo test    ") + chalk.dim("Test API connection"));
+    console.log(
+      chalk.gray("  kesmo plugin  ") +
+        chalk.dim("Select and run an analysis agent"),
+    );
+    console.log(
+      chalk.gray("  kesmo scan    ") + chalk.dim("Run all agents on codebase"),
+    );
+    console.log(
+      chalk.gray("  kesmo chat    ") +
+        chalk.dim("Open interactive chat interface"),
+    );
+    console.log(
+      chalk.gray("  kesmo refactor") +
+        chalk.dim("Generate and apply safe code edits"),
+    );
+    console.log(
+      chalk.gray("  kesmo config  ") +
+        chalk.dim("View or update configuration"),
+    );
+    console.log(
+      chalk.gray("  kesmo test    ") + chalk.dim("Test API connection"),
+    );
     console.log();
     return;
   }
@@ -122,19 +159,29 @@ export async function runSetup(): Promise<void> {
 
   console.log(chalk.bold.white("Let's configure KESMO:\n"));
 
-  const { provider } = await inquirer.prompt({
+  const { provider } = (await inquirer.prompt({
     type: "select",
     name: "provider",
     message: chalk.white("Select your LLM provider:"),
     choices: [
       // { name: chalk.green("●") + " OpenAI      " + chalk.dim("GPT-4.1, o3, o1"), value: "openai" },
       // { name: chalk.magenta("●") + " Anthropic   " + chalk.dim("Claude Sonnet 4, Opus 4"), value: "claude" },
-      { name: chalk.cyan("●") + " OpenRouter  " + chalk.dim("50+ models, many FREE"), value: "openrouter" },
-      { name: chalk.blue("●") + " Google      " + chalk.dim("Gemini 2.5 Pro/Flash"), value: "google" },
+      {
+        name:
+          chalk.cyan("●") +
+          " OpenRouter  " +
+          chalk.dim("50+ models, many FREE"),
+        value: "openrouter",
+      },
+      {
+        name:
+          chalk.blue("●") + " Google      " + chalk.dim("Gemini 2.5 Pro/Flash"),
+        value: "google",
+      },
     ],
-  }) as { provider: ProviderType };
+  })) as { provider: ProviderType };
 
-  const { apiKey } = await inquirer.prompt({
+  const { apiKey } = (await inquirer.prompt({
     type: "password",
     name: "apiKey",
     message: chalk.white(`Enter your ${provider} API key:`),
@@ -148,7 +195,7 @@ export async function runSetup(): Promise<void> {
       }
       return true;
     },
-  }) as { apiKey: string };
+  })) as { apiKey: string };
 
   const suggestedModels = PROVIDER_MODELS[provider];
   const modelChoices = suggestedModels.map((m) => {
@@ -160,19 +207,22 @@ export async function runSetup(): Promise<void> {
       value: m,
     };
   });
-  modelChoices.push({ name: chalk.dim("✎ Enter custom model"), value: "__custom__" });
+  modelChoices.push({
+    name: chalk.dim("✎ Enter custom model"),
+    value: "__custom__",
+  });
 
-  const { modelChoice } = await inquirer.prompt({
+  const { modelChoice } = (await inquirer.prompt({
     type: "select",
     name: "modelChoice",
     message: chalk.white("Select model:"),
     choices: modelChoices,
     pageSize: 12,
-  }) as { modelChoice: string };
+  })) as { modelChoice: string };
 
   let model = modelChoice;
   if (modelChoice === "__custom__") {
-    const { customModel } = await inquirer.prompt({
+    const { customModel } = (await inquirer.prompt({
       type: "input",
       name: "customModel",
       message: chalk.white("Enter model name:"),
@@ -182,7 +232,7 @@ export async function runSetup(): Promise<void> {
         }
         return true;
       },
-    }) as { customModel: string };
+    })) as { customModel: string };
     model = customModel.trim();
   }
 
@@ -202,8 +252,20 @@ export async function runSetup(): Promise<void> {
   console.log(chalk.gray("  Status    ") + chalk.green("Ready"));
   console.log();
   console.log(chalk.bold.white("Next steps:"));
-  console.log(chalk.gray("  1. ") + chalk.cyan("kesmo test") + chalk.gray("    Verify API connection"));
-  console.log(chalk.gray("  2. ") + chalk.cyan("kesmo plugin") + chalk.gray("  Select an analysis agent"));
-  console.log(chalk.gray("  3. ") + chalk.cyan("kesmo scan") + chalk.gray("    Run all agents"));
+  console.log(
+    chalk.gray("  1. ") +
+      chalk.cyan("kesmo test") +
+      chalk.gray("    Verify API connection"),
+  );
+  console.log(
+    chalk.gray("  2. ") +
+      chalk.cyan("kesmo plugin") +
+      chalk.gray("  Select an analysis agent"),
+  );
+  console.log(
+    chalk.gray("  3. ") +
+      chalk.cyan("kesmo scan") +
+      chalk.gray("    Run all agents"),
+  );
   console.log();
 }

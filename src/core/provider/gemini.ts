@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { KesmoConfig } from "../../types.js";
+import type { LLMRunOptions } from "./index.js";
 
 interface GeminiResponse {
   candidates: Array<{
@@ -12,6 +13,7 @@ interface GeminiResponse {
 export async function runGemini(
   prompt: string,
   config: KesmoConfig,
+  options: LLMRunOptions = {},
 ): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1/models/${config.model}:generateContent?key=${config.apiKey}`;
 
@@ -24,8 +26,9 @@ export async function runGemini(
         },
       ],
       generationConfig: {
-        maxOutputTokens: 4096,
-        temperature: 0.5,
+        maxOutputTokens:
+          options.maxOutputTokens ?? (options.reasoning ? 2200 : 1100),
+        temperature: options.temperature ?? (options.reasoning ? 0.2 : 0.4),
       },
     },
     {

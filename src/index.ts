@@ -16,10 +16,15 @@ export {
   getPromptsPath,
 } from "./core/agents/loader.js";
 export {
+  selectToolsetPlugins,
+  buildToolsetPrompt,
+} from "./core/agents/toolset.js";
+export {
   scanFiles,
   getScanStats,
   type ScanOptions,
 } from "./core/scanner/scanner.js";
+export { parseEditPlan, applyEditPlan } from "./core/diff/diff.js";
 export { runLLM } from "./core/provider/index.js";
 export {
   runAgent,
@@ -55,4 +60,8 @@ export type {
   ChunkedFile,
   AnalysisResult,
   LogEntry,
+  EditOperation,
+  EditPlan,
+  EditApplyOptions,
+  EditApplyResult,
 } from "./types.js";
