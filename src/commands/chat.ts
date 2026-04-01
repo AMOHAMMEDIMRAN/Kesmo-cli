@@ -358,7 +358,9 @@ function renderPanel(
 
   console.log(chalk.dim(top));
   const titleText = chalk.bold.white(` ${title} `);
-  console.log(chalk.dim("│") + padRight(titleText, contentWidth) + chalk.dim("│"));
+  console.log(
+    chalk.dim("│") + padRight(titleText, contentWidth) + chalk.dim("│"),
+  );
   console.log(chalk.dim(mid));
 
   const left = mainLines.flatMap((line) => wrapText(line, mainWidth));
@@ -409,7 +411,11 @@ function buildConversationLines(history: ChatTurn[], width: number): string[] {
   for (const turn of turns) {
     const prefix = turn.role === "user" ? "You" : "Kesmo";
     const header = `${prefix}:`;
-    lines.push(chalk.bold(turn.role === "user" ? chalk.blue(header) : chalk.magenta(header)));
+    lines.push(
+      chalk.bold(
+        turn.role === "user" ? chalk.blue(header) : chalk.magenta(header),
+      ),
+    );
     const wrapped = wrapText(turn.content, width).slice(0, 8);
     for (const line of wrapped) {
       lines.push(`  ${truncatePlain(line, width - 2)}`);
@@ -417,7 +423,9 @@ function buildConversationLines(history: ChatTurn[], width: number): string[] {
     lines.push("");
   }
   if (lines.length === 0) {
-    lines.push(chalk.dim("No messages yet. Ask for edits, scans, or docs updates."));
+    lines.push(
+      chalk.dim("No messages yet. Ask for edits, scans, or docs updates."),
+    );
   }
   return lines;
 }
@@ -430,9 +438,14 @@ function renderConversationScreen(state: ChatState): void {
   const sidebar = buildSidebar(state);
   const main = [
     chalk.bold.white("KESMO Workspace"),
-    chalk.dim("Slash commands: /help  /todo  /session  /approvals (diff approval via prompts)"),
+    chalk.dim(
+      "Slash commands: /help  /todo  /session  /approvals (diff approval via prompts)",
+    ),
     "",
-    ...buildConversationLines(state.history, Math.max(40, Math.floor((output.columns || 120) * 0.62))),
+    ...buildConversationLines(
+      state.history,
+      Math.max(40, Math.floor((output.columns || 120) * 0.62)),
+    ),
   ];
   renderPanel("Chat", main, sidebar);
 }
@@ -669,14 +682,22 @@ function buildUnifiedDiff(
 
   const clipped = diff.slice(0, maxLines);
   if (diff.length > clipped.length) {
-    clipped.push(`... truncated ${diff.length - clipped.length} more diff lines`);
+    clipped.push(
+      `... truncated ${diff.length - clipped.length} more diff lines`,
+    );
   }
   return clipped;
 }
 
 function renderDiffPreview(title: string, diffLines: string[]): void {
   const colored = diffLines.map((line) => colorDiffLine(line));
-  renderPanel(title, colored, [chalk.cyan("Approval"), "y = yes", "n = no", "a = all", "q = quit"]);
+  renderPanel(title, colored, [
+    chalk.cyan("Approval"),
+    "y = yes",
+    "n = no",
+    "a = all",
+    "q = quit",
+  ]);
 }
 
 async function askApprovalWithDiff(
@@ -685,7 +706,9 @@ async function askApprovalWithDiff(
   diffLines: string[],
 ): Promise<"yes" | "no" | "all" | "quit"> {
   renderDiffPreview(`Review ${actionLabel}`, diffLines);
-  const raw = (await ask(chalk.yellow("Approve? [y]es / [n]o / [a]ll / [q]uit: ")))
+  const raw = (
+    await ask(chalk.yellow("Approve? [y]es / [n]o / [a]ll / [q]uit: "))
+  )
     .trim()
     .toLowerCase();
   if (raw === "a" || raw === "all") {
@@ -762,7 +785,9 @@ async function executeActionPlan(
         let after = "";
         if (action.type === "write_file") {
           const fullPath = resolveWorkspaceFilePath(action.path);
-          before = fs.existsSync(fullPath) ? fs.readFileSync(fullPath, "utf-8") : "";
+          before = fs.existsSync(fullPath)
+            ? fs.readFileSync(fullPath, "utf-8")
+            : "";
           after = action.content;
         }
         if (action.type === "replace_in_file") {
@@ -772,7 +797,9 @@ async function executeActionPlan(
         }
         if (action.type === "delete_file") {
           const fullPath = resolveWorkspaceFilePath(action.path);
-          before = fs.existsSync(fullPath) ? fs.readFileSync(fullPath, "utf-8") : "";
+          before = fs.existsSync(fullPath)
+            ? fs.readFileSync(fullPath, "utf-8")
+            : "";
           after = "";
         }
 
@@ -984,8 +1011,7 @@ export const chatCommand = new Command("chat")
       : 3;
 
     if (!options.legacy) {
-      const runningInBun = Boolean((globalThis as { Bun?: unknown }).Bun);
-      if (!runningInBun && !options.opentuiRuntime) {
+      if (!options.opentuiRuntime) {
         const entry = path.resolve(process.argv[1] ?? "dist/bin/kesmo.js");
         const args = [entry, "chat", "--opentui-runtime"];
         if (options.maxFiles) {
@@ -1002,7 +1028,7 @@ export const chatCommand = new Command("chat")
         }
 
         await new Promise<void>((resolve, reject) => {
-          const child = spawn("bun", args, {
+          const child = spawn(process.execPath, args, {
             cwd: process.cwd(),
             stdio: "inherit",
             env: process.env,
@@ -1011,7 +1037,7 @@ export const chatCommand = new Command("chat")
           child.on("error", (error) => {
             reject(
               new Error(
-                `Failed to start Bun OpenTUI runtime: ${error.message}. Install Bun or run 'kesmo chat --legacy'.`,
+                `Failed to start OpenTUI runtime: ${error.message}. Run 'kesmo chat --legacy' as fallback.`,
               ),
             );
           });
@@ -1031,14 +1057,23 @@ export const chatCommand = new Command("chat")
         return;
       }
 
-      const { runOpenTuiChat } = await import("./chatOpenTui.js");
-      await runOpenTuiChat({
-        maxFiles,
-        maxTools,
-        includeContext: options.context ?? true,
-        toolsetEnabled: options.toolset ?? true,
-      });
-      return;
+      try {
+        const { runOpenTuiChat } = await import("./chatOpenTui.js");
+        await runOpenTuiChat({
+          maxFiles,
+          maxTools,
+          includeContext: options.context ?? true,
+          toolsetEnabled: options.toolset ?? true,
+        });
+        return;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(
+          chalk.yellow(
+            `OpenTUI unavailable in this runtime (${message}). Falling back to legacy chat.`,
+          ),
+        );
+      }
     }
 
     console.clear();
@@ -1080,16 +1115,14 @@ export const chatCommand = new Command("chat")
     if (!options.newSession) {
       const resume = sessionId
         ? loadSession(sessionId)
-        : listRecentSessions(1)[0] ?? null;
+        : (listRecentSessions(1)[0] ?? null);
       if (resume) {
         sessionId = resume.id;
         history.push(...resume.history);
         todos = resume.todos;
         includeContext = options.context ?? resume.includeContext;
         toolsetEnabled = options.toolset ?? resume.toolsetEnabled;
-        reasoningEnabled = options.reasoning
-          ? true
-          : resume.reasoningEnabled;
+        reasoningEnabled = options.reasoning ? true : resume.reasoningEnabled;
         streamEnabled = options.stream ?? resume.streamEnabled;
         agentMode = resume.agentMode;
         autoApproveActions = resume.autoApproveActions;
@@ -1281,7 +1314,9 @@ export const chatCommand = new Command("chat")
           }
 
           console.log(
-            chalk.yellow("Todo usage: /todo list | /todo add <text> | /todo done <id> | /todo clear"),
+            chalk.yellow(
+              "Todo usage: /todo list | /todo add <text> | /todo done <id> | /todo clear",
+            ),
           );
           continue;
         }
@@ -1601,9 +1636,10 @@ export const chatCommand = new Command("chat")
           }
         }
 
-        activeTools = toolsetEnabled && shouldUseToolset(message)
-          ? selectToolsetPlugins(availableTools, message, maxTools)
-          : [];
+        activeTools =
+          toolsetEnabled && shouldUseToolset(message)
+            ? selectToolsetPlugins(availableTools, message, maxTools)
+            : [];
 
         const toolsetPrompt = buildToolsetPrompt(activeTools, 700);
         const llmPrompt = buildPrompt(
