@@ -127,8 +127,8 @@ export async function runSetup(): Promise<void> {
     name: "provider",
     message: chalk.white("Select your LLM provider:"),
     choices: [
-      { name: chalk.green("●") + " OpenAI      " + chalk.dim("GPT-4.1, o3, o1"), value: "openai" },
-      { name: chalk.magenta("●") + " Anthropic   " + chalk.dim("Claude Sonnet 4, Opus 4"), value: "claude" },
+      // { name: chalk.green("●") + " OpenAI      " + chalk.dim("GPT-4.1, o3, o1"), value: "openai" },
+      // { name: chalk.magenta("●") + " Anthropic   " + chalk.dim("Claude Sonnet 4, Opus 4"), value: "claude" },
       { name: chalk.cyan("●") + " OpenRouter  " + chalk.dim("50+ models, many FREE"), value: "openrouter" },
       { name: chalk.blue("●") + " Google      " + chalk.dim("Gemini 2.5 Pro/Flash"), value: "google" },
     ],
