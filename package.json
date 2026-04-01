@@ -1,16 +1,22 @@
 {
   "name": "kesmo-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AI Code Analysis Engine - Production-ready CLI for intelligent code analysis",
   "main": "dist/bin/kesmo.js",
   "bin": {
     "kesmo": "./dist/bin/kesmo.js"
   },
+  "files": [
+    "dist/**",
+    "prompts/**/*.json",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/bin/kesmo.js",
     "clean": "rm -rf dist",
+    "prepack": "npm run build",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
