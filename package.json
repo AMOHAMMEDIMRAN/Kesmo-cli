@@ -20,9 +20,21 @@
     "llm",
     "typescript"
   ],
-  "author": "",
+  "author": {
+    "name": "Mohammed Imran",
+    "email": "your-email@example.com",
+    "url": "https://github.com/AMOHAMMEDIMRAN"
+  },
   "license": "ISC",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AMOHAMMEDIMRAN/kesmo.git"
+  },
+  "homepage": "https://github.com/AMOHAMMEDIMRAN/kesmo#readme",
+  "bugs": {
+    "url": "https://github.com/AMOHAMMEDIMRAN/kesmo/issues"
+  },
   "dependencies": {
     "axios": "^1.14.0",
     "chalk": "^5.6.2",
