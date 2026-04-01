@@ -1,5 +1,5 @@
 {
-  "name": "kasmo",
+  "name": "kesmo-cli",
   "version": "1.0.0",
   "description": "AI Code Analysis Engine - Production-ready CLI for intelligent code analysis",
   "main": "dist/bin/kesmo.js",
