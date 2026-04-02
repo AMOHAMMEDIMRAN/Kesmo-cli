@@ -1,6 +1,6 @@
 {
   "name": "kesmo-cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AI Code Analysis Engine - Production-ready CLI for intelligent code analysis",
   "main": "dist/bin/kesmo.js",
   "bin": {
